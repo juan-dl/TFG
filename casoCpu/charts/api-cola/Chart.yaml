@@ -1,0 +1,9 @@
+apiVersion: v2
+name: api-cola
+description: Api encargada de realizar monitorer el estado de la cola y del consumidor. Además, atenderá peticiones del dashboard desarrolado en VueJS
+
+type: application
+
+version: 1.1
+
+appVersion: "1.0"

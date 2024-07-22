@@ -1,0 +1,57 @@
+replicas: 1
+
+resources:
+  requests:
+    cpu: 1500m
+    memory: 2G
+  limits:
+    cpu: 1500m
+    memory: 2G
+
+probes:
+  startupProbe:
+    exec:
+      command:
+        - 'rabbitmq-diagnostics'
+        - 'check_local_alarms'
+    failureThreshold: 30
+    periodSeconds: 10
+
+containers:
+  volumeMounts:
+    path: /etc/rabbitmq/definitions.json
+    subPath: definitions.json
+    name: definitions
+  volumeName: definitions
+
+rabbitmq:
+  additionalConfig: |-
+    load_definitions = /etc/rabbitmq/definitions.json
+
+configmap:
+  data:
+    definitions.json: |-
+      {
+          "users": [
+          {
+            "name": "pruebas",
+            "password": "pruebas",
+            "tags": "administrator"
+          }
+        ],
+          "vhosts": [
+          {
+            "name": "pruebas"
+          }
+        ],
+          "permissions": [
+          {
+            "user": "pruebas",
+            "vhost": "pruebas",
+            "configure": ".",
+            "write": ".*",
+            "read": ".*"
+          }
+        ]
+      }
+    

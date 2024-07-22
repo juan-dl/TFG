@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Values.labelApp }}
+    concern: {{ .Values.labelConcern }}
+    release: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.labelApp }}
+      concern: {{ .Values.labelConcern }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labelApp }}
+        concern: {{ .Values.labelConcern }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}
+        image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- toYaml .Values.probes | nindent 8 }}
+        ports:
+        - containerPort: {{ .Values.containerPort }}

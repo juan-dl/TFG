@@ -1,0 +1,51 @@
+labelApp: locust
+labelConcern: prueba
+
+image:
+  name: locust
+  tag: latest
+  pullPolicy: Never
+
+containerPort: 8089
+
+probes:
+  startupProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/home/locust/health.txt'
+    failureThreshold: 30
+    periodSeconds: 10
+  livenessProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/home/locust/health.txt'
+    failureThreshold: 1
+    periodSeconds: 15
+  readinessProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/home/locust/health.txt'
+    failureThreshold: 1
+    periodSeconds: 15
+
+svc:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8089
+
+ingress:
+  rewriteTarget: /$2
+  pathType: Prefix
+  path: /locust(/|$)(.*)
+  backend:
+    servicePort: 80

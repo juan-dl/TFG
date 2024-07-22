@@ -1,0 +1,9 @@
+apiVersion: v2
+name: cons-p
+description: Consumidor que simula la recepción y procesamiento de mensajes con una pequeña carga de CPU
+
+type: application
+
+version: 1.1    
+
+appVersion: "1.16.0"

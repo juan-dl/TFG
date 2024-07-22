@@ -1,0 +1,22 @@
+#yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: scaled-object-{{ .Release.Name }}-{{ .Chart.Name }}
+spec:
+  scaleTargetRef:
+    name: {{ .Release.Name }}-{{ .Chart.Name }}
+  maxReplicaCount: {{ .Values.scaledObject.spec.maxReplicaCount }}
+  minReplicaCount: {{ .Values.scaledObject.spec.minReplicaCount }}
+  advanced:
+    {{- toYaml .Values.scaledObject.spec.advanced | nindent 4 }}
+  triggers:
+  - type:  {{ .Values.scaledObject.spec.triggers.type }}
+    metadata: 
+      protocol: {{ .Values.scaledObject.spec.triggers.metadata.protocol }}
+      queueName: {{ .Values.scaledObject.spec.triggers.metadata.queueName }}
+      mode: {{ .Values.scaledObject.spec.triggers.metadata.mode }}
+      value: "{{ .Values.scaledObject.spec.triggers.metadata.value }}"
+      metricName: {{ .Values.scaledObject.spec.triggers.metadata.metricName }}
+    authenticationRef:
+      name: keda-trigger-auth-{{ .Release.Name }}-{{ .Chart.Name }}

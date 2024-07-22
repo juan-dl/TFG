@@ -1,0 +1,15 @@
+services:
+  app:
+    image: dash-cola:latest
+    build:
+      context: .
+    volumes:
+      - .:/library
+    command:
+      - npm
+      - run
+      - dev
+    ports:
+      - 8093:3001
+      - 9099:9099
+

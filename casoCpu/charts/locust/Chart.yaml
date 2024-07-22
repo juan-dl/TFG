@@ -1,0 +1,9 @@
+apiVersion: v2
+name: locust
+description: Despliegue de Locust que simulará a los usuarios cuya función es enviar mensajes a la cola
+
+type: application
+
+version: 1.1
+
+appVersion: "1.0"

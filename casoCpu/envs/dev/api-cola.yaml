@@ -1,0 +1,67 @@
+labelApp: api
+labelConcern: prueba 
+
+replicas: 1
+
+image:
+  name: api-cola
+  tag: latest
+  pullPolicy: Never
+
+containerPort: 3000
+
+initContainer:
+  image:
+    name: curlimages/curl
+    tag: 8.8.0
+  service: http://cola-pruebas-rabbit.pruebas.svc.cluster.local
+  port: 15672
+
+probes:
+  startupProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    failureThreshold: 30
+    periodSeconds: 10
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    failureThreshold: 1
+    periodSeconds: 15
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    failureThreshold: 1
+    periodSeconds: 15
+
+svc:
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+
+resources:
+  requests:
+    cpu: 0.5
+
+role:
+  rules:
+  - apiGroups: ["apps","autoscaling"] 
+    resources: ["deployments","horizontalpodautoscalers"]
+    verbs: ["get", "watch", "list"]
+
+roleBinding:
+  subjects:
+    apiGroup: ""
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+
+ingress:
+  rewriteTarget: /$1
+  pathType: Prefix
+  path: /api/?(.*)
+  backend:
+    servicePort: 3000

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: cons-cpu
+description: Consumidor que generará una gran carga de CPU
+
+type: application
+
+version: 1.1
+
+appVersion: "1.16.0"

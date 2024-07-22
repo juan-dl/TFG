@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Values.labelApp }}
+    concern: {{ .Values.labelConcern }}
+    release: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.labelApp }}
+      concern: {{ .Values.labelConcern }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labelApp }}
+        concern: {{ .Values.labelConcern }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}
+        image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- toYaml .Values.probes | nindent 8 }}
+      initContainers:
+        - name: init-{{ .Release.Name }}
+          image: "{{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}"
+          command: 
+            - 'sh'
+            - '-c' 
+            - 'while ! curl "{{ .Values.initContainer.service }}:{{ .Values.initContainer.port }}"; do sleep 10; done;'

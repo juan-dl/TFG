@@ -1,0 +1,96 @@
+---
+labelApp: consumidor
+labelConcern: prueba
+
+image:
+  name: cons-keda
+  tag: latest
+  pullPolicy: Never
+
+resources:
+  requests:
+    cpu: 0.5
+
+probes:
+  startupProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/health.txt'
+    failureThreshold: 30
+    periodSeconds: 10
+  livenessProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/health.txt'
+    failureThreshold: 1
+    periodSeconds: 15
+  readinessProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/health.txt'
+    failureThreshold: 1
+    periodSeconds: 15
+
+initContainer:
+  image:
+    name: curlimages/curl
+    tag: 8.8.0
+  service: http://cola-pruebas-rabbit.pruebas.svc.cluster.local
+  port: 15672
+
+secret:
+  type: Opaque
+  data:
+    url-keda: YW1xcDovL3BydWViYXM6cHJ1ZWJhc0Bjb2xhLXBydWViYXMtcmFiYml0LnBydWViYXMuc3ZjLmNsdXN0ZXIubG9jYWw6NTY3Mi9wcnVlYmFz
+   
+scaledObject:
+  spec:
+    maxReplicaCount: 50
+    minReplicaCount: 1
+    advanced:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 30
+          policies:
+          - type: Percent
+            value: 30
+            periodSeconds: 30
+          - type: Pods
+            value: 5
+            periodSeconds: 30
+          selectPolicy: Min
+        scaleUp:
+          stabilizationWindowSeconds: 10
+          policies:
+            - type: Percent
+              value: 50
+              periodSeconds: 10
+            - type: Pods
+              value: 5
+              periodSeconds: 10
+          selectPolicy: Max    
+    triggers:      
+      type: rabbitmq
+      metadata:
+        protocol: amqp
+        queueName: colaPruebas
+        mode: QueueLength 
+        value: "50"
+        metricName: custom-testqueue 
+
+triggerAuth:
+  secretTargetRef:
+    parameter: host
+    key: url-keda
+
+ 
+

@@ -1,0 +1,26 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  resources:
+    {{- toYaml .Values.resources | nindent 4 }}
+  override:
+    statefulSet:
+      spec:
+        template:
+          spec:
+            containers:
+            - name: rabbitmq
+              {{- toYaml .Values.probes | nindent 14 }}
+              volumeMounts:
+                - mountPath: {{ .Values.containers.volumeMounts.path }}
+                  subPath: {{ .Values.containers.volumeMounts.subPath }}
+                  name: {{ .Values.containers.volumeMounts.name }}
+            volumes:
+            - name: {{ .Values.containers.volumeName }}
+              configMap:
+                name: definitions-{{ .Release.Name }}-{{ .Chart.Name }}
+  rabbitmq:
+    {{- toYaml .Values.rabbitmq | nindent 4 }}

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-{{ .Release.Name }}-{{ .Chart.Name }}
+spec:
+  selector:
+    app: {{ .Values.labelApp }}
+    concern: {{ .Values.labelConcern }}
+    release: {{ .Release.Name }}
+  ports:
+    {{- toYaml .Values.svc.ports | nindent 4 }}

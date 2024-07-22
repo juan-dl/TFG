@@ -1,0 +1,50 @@
+labelApp: dashboard
+labelConcern: prueba
+
+replicas: 1
+
+image:
+  name: dash-cola
+  tag: latest
+  pullPolicy: Never
+
+containerPort: 80
+
+probes:
+  startupProbe:
+    httpGet:
+      path: /health
+      port: 80
+    failureThreshold: 30
+    periodSeconds: 10
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 80
+    failureThreshold: 1
+    periodSeconds: 15
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 80
+    failureThreshold: 1
+    periodSeconds: 15
+initContainer:
+  image:
+    name: curlimages/curl
+    tag: 8.8.0
+  service: http://cola-pruebas-rabbit.pruebas.svc.cluster.local
+  port: 15672
+
+svc:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+ingress:
+  rewriteTarget: /$1
+  pathType: Prefix
+  path: /(.*)
+  backend:
+    servicePort: 80

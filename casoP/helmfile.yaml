@@ -1,0 +1,48 @@
+environments:
+  dev:
+---
+# charts 
+repositories:
+  - name: metrics-server
+    url: https://kubernetes-sigs.github.io/metrics-server/
+  - name: rabbitmq-cluster-operator
+    url: https://charts.bitnami.com/bitnami
+
+# charts
+releases:
+  - name: ingress-controller
+    chart: ./charts/ingress-nginx
+    namespace: ingress-nginx
+  - name: metrics-server
+    chart: metrics-server/metrics-server
+    namespace: kube-system
+  - name: rabbitmq-cluster-operator
+    namespace: pruebas
+    chart: bitnami/rabbitmq-cluster-operator
+  - name: consumidor
+    namespace: pruebas
+    chart: ./charts/cons-p
+    values:
+      - ./envs/{{.Environment.Name}}/cons-p.yaml
+  - name: api
+    namespace: pruebas
+    chart: ./charts/api-cola
+    values:
+      - ./envs/{{.Environment.Name}}/api-cola.yaml
+  - name: locust
+    namespace: pruebas
+    chart: ./charts/locust
+    values:
+      - ./envs/{{.Environment.Name}}/locust.yaml
+  - name: dashboard
+    namespace: pruebas
+    chart: ./charts/dash-cola
+    values:
+      - ./envs/{{.Environment.Name}}/dash-cola.yaml
+  - name: cola-pruebas
+    namespace: pruebas
+    chart: ./charts/rabbit
+    needs: 
+    - rabbitmq-cluster-operator
+    values:
+      - ./envs/{{.Environment.Name}}/rabbit.yaml

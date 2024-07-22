@@ -1,0 +1,78 @@
+labelApp: consumidor
+labelConcern: prueba
+
+image:
+  name: cons-cpu
+  tag: latest
+  pullPolicy: Never
+
+resources:
+  requests:
+    cpu: 0.5
+
+probes:
+  startupProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/health.txt'
+    failureThreshold: 30
+    periodSeconds: 10
+  livenessProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/health.txt'
+    failureThreshold: 1
+    periodSeconds: 15
+  readinessProbe:
+    exec:
+      command:
+        - 'grep'
+        - '-q'
+        - '0'
+        - '/health.txt'
+    failureThreshold: 1
+    periodSeconds: 15
+
+initContainer:
+  image:
+    name: curlimages/curl
+    tag: 8.8.0
+  service: http://cola-pruebas-rabbit.pruebas.svc.cluster.local
+  port: 15672
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 50
+  metrics:
+    type: Resource
+  resource:
+    name: cpu
+    target:
+      type: Utilization
+      averageUtilization: 50
+  scaleDown:
+    stabilizationWindowSeconds: 30
+    policies:
+      - type: Percent
+        value: 30
+        periodSeconds: 30
+      - type: Pods
+        value: 5
+        periodSeconds: 30
+    selectPolicy: Min
+  scaleUp:
+    stabilizationWindowSeconds: 10
+    policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 10
+      - type: Pods
+        value: 5
+        periodSeconds: 10
+    selectPolicy: Max    

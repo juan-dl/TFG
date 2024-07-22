@@ -1,0 +1,9 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-trigger-auth-{{ .Release.Name }}-{{ .Chart.Name }}
+spec:
+  secretTargetRef:
+    - parameter: {{ .Values.triggerAuth.secretTargetRef.parameter }}
+      name: secreto-{{ .Release.Name }}-{{ .Chart.Name }}
+      key: {{ .Values.triggerAuth.secretTargetRef.key }}

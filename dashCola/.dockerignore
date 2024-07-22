@@ -1,0 +1,8 @@
+node_modules
+Dockerfile
+Dockerfile.deploy
+.env
+.gitignore
+docker-compose.yaml
+dist/
+Makefile
