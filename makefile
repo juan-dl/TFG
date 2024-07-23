@@ -17,6 +17,3 @@ cleanP:
 
 cleanKeda:
 	./finPruebas.sh Keda
-
-forward:
-	./forwardSvc.sh
